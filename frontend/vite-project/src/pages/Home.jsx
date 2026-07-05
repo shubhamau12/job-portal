@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -15,7 +16,6 @@ import {
 } from "../services/jobService";
 
 function Home() {
-
   const navigate =
     useNavigate();
 
@@ -33,49 +33,43 @@ function Home() {
     );
 
   // Load Jobs
-  const loadJobs =
-    async () => {
-
-      try {
-
-        let data;
-
+  const fetchJobs =
+    useCallback(
+      async () => {
         if (
           activeTab ===
           "cs"
         ) {
-
-          data =
-            await getCSJobs();
-
-        } else {
-
-          data =
-            await getAllJobs();
+          return getCSJobs();
         }
 
-        setJobs(data);
-
-      } catch (
-        error
-      ) {
-
-        console.log(
-          error
-        );
-      }
-    };
+        return getAllJobs();
+      },
+      [activeTab]
+    );
 
   useEffect(() => {
+    let isActive =
+      true;
 
-    loadJobs();
+    fetchJobs()
+      .then((data) => {
+        if (isActive) {
+          setJobs(data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 
-  }, [activeTab]);
+    return () => {
+      isActive = false;
+    };
+  }, [fetchJobs]);
 
   // Delete Job
   const handleDelete =
     async (id) => {
-
       const confirmDelete =
         window.confirm(
           "Delete this job?"
@@ -87,7 +81,6 @@ function Home() {
         return;
 
       try {
-
         await deleteJob(
           id
         );
@@ -96,12 +89,13 @@ function Home() {
           "Job Deleted Successfully"
         );
 
-        loadJobs();
+        const data =
+          await fetchJobs();
 
+        setJobs(data);
       } catch (
         error
       ) {
-
         console.log(
           error
         );
@@ -115,7 +109,6 @@ function Home() {
   // Edit Job
   const handleEdit =
     (job) => {
-
       navigate(
         "/admin",
         {
@@ -129,7 +122,6 @@ function Home() {
   // Logout
   const handleLogout =
     () => {
-
       localStorage.removeItem(
         "token"
       );
@@ -143,49 +135,49 @@ function Home() {
     <div
       style={{
         background:
-          "#f4f6f9",
+          "linear-gradient(to bottom, #eef4ff, #ffffff)",
         minHeight:
           "100vh",
         padding:
-          "40px 20px",
+          "20px",
       }}
     >
-
-      {/* Header */}
+      {/* HERO */}
       <div
         style={{
-          display:
-            "flex",
-          justifyContent:
-            "space-between",
-          alignItems:
-            "center",
-          flexWrap:
-            "wrap",
-          gap:
-            "20px",
+          background:
+            "linear-gradient(135deg,#0d5aa7,#1d74c9)",
+          borderRadius:
+            "25px",
+          padding:
+            "50px 20px",
           marginBottom:
-            "40px",
+            "30px",
+          textAlign:
+            "center",
+          position:
+            "relative",
+          overflow:
+            "hidden",
+          boxShadow:
+            "0 8px 25px rgba(0,0,0,0.15)",
         }}
       >
-
-        <h1
+        {/* Admin Buttons */}
+        <div
           style={{
-            color:
-              "#0d5aa7",
-            fontSize:
-              "42px",
-            margin: 0,
+            position:
+              "absolute",
+            top: "20px",
+            right: "20px",
+            display:
+              "flex",
+            gap: "10px",
+            flexWrap:
+              "wrap",
           }}
         >
-          Government Job
-          Portal
-        </h1>
-
-        <div>
-
           {!isAdmin ? (
-
             <button
               onClick={() =>
                 navigate(
@@ -194,30 +186,24 @@ function Home() {
               }
               style={{
                 background:
-                  "linear-gradient(135deg, #0d5aa7, #1d74c9)",
-                color:
                   "white",
+                color:
+                  "#0d5aa7",
                 border:
                   "none",
                 padding:
-                  "14px 24px",
+                  "12px 20px",
                 borderRadius:
-                  "12px",
+                  "10px",
                 cursor:
                   "pointer",
-                fontSize:
-                  "16px",
                 fontWeight:
                   "bold",
-                boxShadow:
-                  "0 4px 12px rgba(0,0,0,0.2)",
               }}
             >
               🔐 Admin Login
             </button>
-
           ) : (
-
             <>
               <button
                 onClick={() =>
@@ -225,7 +211,9 @@ function Home() {
                     "/admin"
                   )
                 }
-                style={buttonStyle}
+                style={
+                  buttonStyle
+                }
               >
                 Add Job
               </button>
@@ -261,6 +249,21 @@ function Home() {
               </button>
 
               <button
+  onClick={() =>
+    navigate(
+      "/add-answer-key"
+    )
+  }
+  style={{
+    ...buttonStyle,
+    background:
+      "#fd7e14",
+  }}
+>
+  Add Answer Key
+</button>
+
+              <button
                 onClick={
                   handleLogout
                 }
@@ -275,24 +278,51 @@ function Home() {
             </>
           )}
         </div>
+
+        <h1
+          style={{
+            color:
+              "white",
+            fontSize:
+              "clamp(38px,6vw,60px)",
+            margin: 0,
+          }}
+        >
+          🇮🇳 Government Job
+        </h1>
+
+        <p
+          style={{
+            color:
+              "#dcecff",
+            fontSize:
+              "clamp(16px,2vw,24px)",
+            marginTop:
+              "15px",
+            fontStyle:
+              "italic",
+          }}
+        >
+          “Your Gateway to
+          Secure Government
+          Careers”
+        </p>
       </div>
 
-      {/* Menu */}
+      {/* MENU */}
       <div
         style={{
           display:
             "flex",
           justifyContent:
             "center",
-          gap:
-            "20px",
           flexWrap:
             "wrap",
+          gap: "12px",
           marginBottom:
-            "40px",
+            "30px",
         }}
       >
-
         <button
           onClick={() =>
             setActiveTab(
@@ -300,17 +330,17 @@ function Home() {
             )
           }
           style={{
-            ...tabStyle,
+            ...tabBtn,
             background:
               activeTab ===
               "all"
                 ? "#0d5aa7"
-                : "#e9ecef",
+                : "#ddd",
             color:
               activeTab ===
               "all"
                 ? "white"
-                : "#333",
+                : "black",
           }}
         >
           📋 All Jobs
@@ -323,17 +353,9 @@ function Home() {
             )
           }
           style={{
-            ...tabStyle,
+            ...tabBtn,
             background:
-              activeTab ===
-              "cs"
-                ? "#198754"
-                : "#e9ecef",
-            color:
-              activeTab ===
-              "cs"
-                ? "white"
-                : "#333",
+              "#198754",
           }}
         >
           💻 CS Jobs
@@ -346,11 +368,9 @@ function Home() {
             )
           }
           style={{
-            ...tabStyle,
+            ...tabBtn,
             background:
               "#dc3545",
-            color:
-              "white",
           }}
         >
           🎫 Admit Cards
@@ -363,19 +383,32 @@ function Home() {
             )
           }
           style={{
-            ...tabStyle,
+            ...tabBtn,
             background:
               "#6f42c1",
-            color:
-              "white",
           }}
         >
           📄 Results
         </button>
 
+     <button
+  onClick={() =>
+    navigate(
+      "/answer-keys"
+    )
+  }
+  style={{
+    ...tabBtn,
+    background:
+      "#fd7e14",
+  }}
+>
+  📝 Answer Key
+</button>
+
       </div>
 
-      {/* Jobs Table */}
+      {/* JOB TABLE */}
       <div
         style={{
           overflowX:
@@ -390,7 +423,6 @@ function Home() {
             "0 4px 15px rgba(0,0,0,0.1)",
         }}
       >
-
         <table
           width="100%"
           cellPadding="20"
@@ -401,7 +433,6 @@ function Home() {
               "center",
           }}
         >
-
           <thead>
             <tr
               style={{
@@ -414,11 +445,9 @@ function Home() {
               <th>
                 Post Name
               </th>
-
               <th>
                 Last Date
               </th>
-
               <th>
                 Job Details
               </th>
@@ -432,25 +461,23 @@ function Home() {
           </thead>
 
           <tbody>
-
             {jobs.map(
               (job) => (
-
                 <tr
                   key={
                     job._id
                   }
-                  style={{
-                    borderBottom:
-                      "1px solid #ddd",
-                  }}
                 >
                   <td>
-                    {job.postName}
+                    {
+                      job.postName
+                    }
                   </td>
 
                   <td>
-                    {job.lastDate}
+                    {
+                      job.lastDate
+                    }
                   </td>
 
                   <td>
@@ -465,13 +492,13 @@ function Home() {
                           "none",
                       }}
                     >
-                      View Details
+                      View
+                      Details
                     </Link>
                   </td>
 
                   {isAdmin && (
                     <td>
-
                       <button
                         onClick={() =>
                           handleEdit(
@@ -479,9 +506,20 @@ function Home() {
                           )
                         }
                         style={{
-                          ...actionButton,
                           background:
                             "#007bff",
+                          color:
+                            "white",
+                          border:
+                            "none",
+                          padding:
+                            "8px 14px",
+                          marginRight:
+                            "10px",
+                          borderRadius:
+                            "8px",
+                          cursor:
+                            "pointer",
                         }}
                       >
                         Edit
@@ -494,34 +532,155 @@ function Home() {
                           )
                         }
                         style={{
-                          ...actionButton,
                           background:
                             "red",
+                          color:
+                            "white",
+                          border:
+                            "none",
+                          padding:
+                            "8px 14px",
+                          borderRadius:
+                            "8px",
+                          cursor:
+                            "pointer",
                         }}
                       >
                         Delete
                       </button>
-
                     </td>
                   )}
                 </tr>
               )
             )}
-
           </tbody>
         </table>
       </div>
-    </div>
+
+     {/* FOOTER */}
+<div
+  style={{
+    marginTop: "40px",
+    background:
+      "linear-gradient(135deg, #0d5aa7, #063970)",
+    color: "white",
+    padding:
+      "40px 20px",
+    borderRadius:
+      "25px 25px 0 0",
+    textAlign:
+      "center",
+    boxShadow:
+      "0 -4px 15px rgba(0,0,0,0.15)",
+  }}
+>
+  <h2
+    style={{
+      color: "white",
+      fontSize: "34px",
+      marginBottom:
+        "10px",
+      fontWeight:
+        "bold",
+    }}
+  >
+    📢 Join Us
+  </h2>
+
+  <p
+    style={{
+      color:
+        "#dcecff",
+      fontSize:
+        "18px",
+      marginBottom:
+        "25px",
+    }}
+  >
+    Follow us for latest
+    updates
+  </p>
+
+  <div
+    style={{
+      display:
+        "flex",
+      justifyContent:
+        "center",
+      flexWrap:
+        "wrap",
+      gap: "15px",
+      marginBottom:
+        "25px",
+    }}
+  >
+    <a
+      href="https://youtube.com/@govexaminfo9?si=-t5Dv08i-auWZhGf"
+      target="_blank"
+      rel="noreferrer"
+      style={socialBtn(
+        "#FF0000"
+      )}
+    >
+      ▶ YouTube
+    </a>
+
+    <a
+      href="https://www.facebook.com/share/1JCju5hDHv/?mibextid=wwXIfr"
+      target="_blank"
+      rel="noreferrer"
+      style={socialBtn(
+        "#1877F2"
+      )}
+    >
+      👍 Facebook
+    </a>
+
+    <a
+      href="https://www.instagram.com/apnagovexam?igsh=c2dobmFpMTY3bmF5&utm_source=qr"
+      target="_blank"
+      rel="noreferrer"
+      style={socialBtn(
+        "#E4405F"
+      )}
+    >
+      📸 Instagram
+    </a>
+  </div>
+
+  <hr
+    style={{
+      border:
+        "0.5px solid rgba(255,255,255,0.2)",
+      width: "85%",
+      margin:
+        "20px auto",
+    }}
+  />
+
+  <p
+    style={{
+      color:
+        "#dcecff",
+      fontSize:
+        "14px",
+      margin: 0,
+    }}
+  >
+    © 2026 Government Job
+    Portal | All Rights
+    Reserved
+  </p>
+</div>
+        </div>
+      
+    
   );
 }
 
 const buttonStyle = {
-  marginRight:
-    "10px",
-  color:
-    "white",
-  border:
-    "none",
+  color: "white",
+  border: "none",
   padding:
     "12px 20px",
   borderRadius:
@@ -532,34 +691,32 @@ const buttonStyle = {
     "#0d5aa7",
 };
 
-const tabStyle = {
-  border:
-    "none",
+const tabBtn = {
+  color: "white",
+  border: "none",
   padding:
-    "15px 28px",
+    "14px 22px",
   borderRadius:
-    "14px",
+    "12px",
   cursor:
     "pointer",
-  fontSize:
-    "18px",
   fontWeight:
     "bold",
 };
 
-const actionButton = {
+const socialBtn = (
+  color
+) => ({
+  background:
+    color,
   color:
     "white",
-  border:
-    "none",
   padding:
-    "8px 14px",
-  marginRight:
-    "10px",
+    "12px 18px",
   borderRadius:
-    "8px",
-  cursor:
-    "pointer",
-};
+    "10px",
+  textDecoration:
+    "none",
+});
 
 export default Home;

@@ -6,6 +6,7 @@ import jobRoutes from "./routes/jobRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import resultRoutes from "./routes/resultRoutes.js";
 import admitCardRoutes from "./routes/admitCardRoutes.js";
+import answerKeyRoutes from "./routes/answerKeyRoutes.js";
 
 dotenv.config();
 
@@ -48,7 +49,10 @@ app.use(
   "/api/results",
   resultRoutes
 );
-
+app.use(
+  "/api/answer-keys",
+  answerKeyRoutes
+);
 // Test Route
 app.get("/", (req, res) => {
   res.send("API running...");

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   useNavigate,
   useLocation,
@@ -8,63 +8,50 @@ import {
   updateJob,
 } from "../services/jobService";
 
-function Admin() {
-  const navigate =
-    useNavigate();
-  const location =
-    useLocation();
+const getInitialFormData = (editJob) => ({
+  postName: "",
+  totalVacancies: "",
+  ageLimit: "",
+  minimumQualification:
+    "",
+  selectionProcess:
+    "",
+  location: "",
+  lastDate: "",
+  eligibilityCriteria:
+    "",
+  category: "CS",
 
-  const editJob =
-    location.state?.job;
+  notificationDate:
+    "",
+  applicationStartDate:
+    "",
+  applicationLastDate:
+    "",
+  examDate: "",
+  admitCardDate: "",
 
-  const [formData, setFormData] =
-    useState({
-      postName: "",
-      totalVacancies: "",
-      ageLimit: "",
-      minimumQualification:
-        "",
-      selectionProcess:
-        "",
-      location: "",
-      lastDate: "",
-      eligibilityCriteria:
-        "",
-      category: "CS",
+  generalFee: "",
+  obcFee: "",
+  scstFee: "",
+  pwdFee: "",
 
-      notificationDate:
-        "",
-      applicationStartDate:
-        "",
-      applicationLastDate:
-        "",
-      examDate: "",
-      admitCardDate: "",
+  applyOnlineLink:
+    "",
+  notificationPdf: "",
 
-      generalFee: "",
-      obcFee: "",
-      scstFee: "",
-      pwdFee: "",
-
-      applyOnlineLink:
+  positions: [
+    {
+      positionName:
         "",
-      notificationPdf: "",
-
-positions: [
-        {
-          positionName:
-            "",
-          qualification:
-            "",
-          numberOfPosts:
-            "",
-        },
-      ],
-    });
-
-  useEffect(() => {
-    if (editJob) {
-      setFormData({
+      qualification:
+        "",
+      numberOfPosts:
+        "",
+    },
+  ],
+  ...(editJob
+    ? {
         ...editJob,
         positions:
           editJob.positions
@@ -80,9 +67,25 @@ positions: [
                     "",
                 },
               ],
-      });
-    }
-  }, [editJob]);
+      }
+    : {}),
+});
+
+function Admin() {
+  const navigate =
+    useNavigate();
+  const location =
+    useLocation();
+
+  const editJob =
+    location.state?.job;
+
+  const [formData, setFormData] =
+    useState(() =>
+      getInitialFormData(
+        editJob
+      )
+    );
 
   const handleChange = (
     e

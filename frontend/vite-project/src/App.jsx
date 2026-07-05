@@ -18,6 +18,9 @@ import AdmitCardDetails from "./pages/AdmitCardDetails";
 import AddResult from "./pages/AddResult";
 import ResultList from "./pages/ResultList";
 import ResultDetails from "./pages/ResultDetails";
+import AddAnswerKey from "./pages/AddAnswerKey";
+import AnswerKeyList from "./pages/AnswerKeyList";
+import AnswerKeyDetails from "./pages/AnswerKeyDetails";
 
 function App() {
   return (
@@ -99,6 +102,27 @@ function App() {
             <ResultDetails />
           }
         />
+
+        <Route
+  path="/answer-keys"
+  element={
+    <AnswerKeyList />
+  }
+/>
+
+<Route
+  path="/answer-key/:id"
+  element={
+    <AnswerKeyDetails />
+  }
+/>
+
+<Route
+  path="/add-answer-key"
+  element={
+    <AddAnswerKey />
+  }
+/>
 
       </Routes>
     </BrowserRouter>

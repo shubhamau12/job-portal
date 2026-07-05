@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Dynamic API URL
 const API_URL =
-  `${window.location.protocol}//${window.location.hostname}:5000/api/jobs`;
+  `${import.meta.env.VITE_API_URL}/api/jobs`;
 
 // Token config
 const getConfig = () => {

@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -25,33 +26,42 @@ function ResultList() {
       "token"
     );
 
-  useEffect(() => {
-    loadResults();
-  }, []);
-
-  const loadResults =
+  const fetchResults =
+    useCallback(
     async () => {
-
-      try {
-
-        const response =
-          await axios.get(
-            `${import.meta.env.VITE_API_URL}/api/results`
-          );
-
-        setResults(
-          response.data
+      const response =
+        await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/results`
         );
 
-      } catch (
-        error
-      ) {
+      return response.data;
+    },
+    []
+    );
 
+  useEffect(() => {
+    let isActive =
+      true;
+
+    fetchResults()
+      .then((data) => {
+        if (isActive) {
+          setResults(
+            data
+          );
+        }
+      })
+      .catch((error) => {
         console.log(
           error
         );
-      }
+      });
+
+    return () => {
+      isActive =
+        false;
     };
+  }, [fetchResults]);
 
   // DELETE
   const handleDelete =
@@ -77,7 +87,12 @@ function ResultList() {
           "Result Deleted Successfully"
         );
 
-        loadResults();
+        const data =
+          await fetchResults();
+
+        setResults(
+          data
+        );
 
       } catch (
         error

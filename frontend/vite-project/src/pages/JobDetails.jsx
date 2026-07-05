@@ -24,11 +24,8 @@ function JobDetails() {
     useState(null);
 
   useEffect(() => {
-    loadJob();
-  }, []);
-
-  const loadJob =
-    async () => {
+    const loadJob =
+      async () => {
 
       try {
 
@@ -46,6 +43,9 @@ function JobDetails() {
         );
       }
     };
+
+    loadJob();
+  }, [id]);
 
   if (!job) {
     return (

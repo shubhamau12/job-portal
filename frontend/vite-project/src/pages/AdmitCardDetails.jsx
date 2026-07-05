@@ -22,11 +22,8 @@ function AdmitCardDetails() {
     useState(null);
 
   useEffect(() => {
-    loadCard();
-  }, []);
-
-  const loadCard =
-    async () => {
+    const loadCard =
+      async () => {
 
       try {
 
@@ -46,6 +43,9 @@ function AdmitCardDetails() {
         );
       }
     };
+
+    loadCard();
+  }, [id]);
 
   if (!card) {
     return (

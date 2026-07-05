@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -24,25 +25,40 @@ function AdmitCardList() {
       "token"
     );
 
-  useEffect(() => {
-    loadAdmitCards();
-  }, []);
-
-  const loadAdmitCards =
+  const fetchAdmitCards =
+    useCallback(
     async () => {
-      try {
-        const response =
-          await axios.get(
-            `${import.meta.env.VITE_API_URL}/api/admit-cards`
-          );
-    
-        setAdmitCards(
-          response.data
+      const response =
+        await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/admit-cards`
         );
-      } catch (error) {
+
+      return response.data;
+    },
+    []
+    );
+
+  useEffect(() => {
+    let isActive =
+      true;
+
+    fetchAdmitCards()
+      .then((data) => {
+        if (isActive) {
+          setAdmitCards(
+            data
+          );
+        }
+      })
+      .catch((error) => {
         console.log(error);
-      }
+      });
+
+    return () => {
+      isActive =
+        false;
     };
+  }, [fetchAdmitCards]);
 
   // Delete Admit Card
   const handleDelete =
@@ -66,7 +82,12 @@ function AdmitCardList() {
           "Admit Card Deleted Successfully"
         );
 
-        loadAdmitCards();
+        const data =
+          await fetchAdmitCards();
+
+        setAdmitCards(
+          data
+        );
       } catch (error) {
         console.log(error);
 
